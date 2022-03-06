@@ -1,0 +1,17 @@
+{
+  "name": "akitaboxchallenges",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/stringInterpolator.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "author": "Tucker Bullara",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3"
+  }
+}
