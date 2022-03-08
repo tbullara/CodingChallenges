@@ -11,7 +11,7 @@ export class StringInterpolator {
         if (!this.template || !this.variableMap)
             throw new Error('Please provide a value for template and variable map');
 
-        let matches = this.template.match(this.getInteriorPattern());
+        let matches = this.template.match(this.getAnyMatchBetweenBrackets());
 
         this.variableMap.forEach((value, key) => {
             // values can be booleans so truthy check will not work
@@ -44,16 +44,16 @@ export class StringInterpolator {
             replacement = replacement.toString();
         }
 
-        const pattern = this.getPattern(key);
+        const pattern = this.getKeyMatchBetweenBrackets(key);
         this.template = this.template.replace(pattern, replacement);
     }
 
-    private getPattern(variableBetweenBrackets: string): RegExp {
+    private getKeyMatchBetweenBrackets(variableBetweenBrackets: string): RegExp {
         // match variable name between ${} inclusive
         return new RegExp('\\$\\{' + variableBetweenBrackets + '\\}', 'g');
     }
 
-    private getInteriorPattern(): RegExp {
+    private getAnyMatchBetweenBrackets(): RegExp {
         return new RegExp('\\${(.*?)}', 'g');
     }
 }

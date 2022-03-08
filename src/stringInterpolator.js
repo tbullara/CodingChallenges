@@ -10,7 +10,7 @@ var StringInterpolator = /** @class */ (function () {
         var _this = this;
         if (!this.template || !this.variableMap)
             throw new Error('Please provide a value for template and variable map');
-        var matches = this.template.match(this.getInteriorPattern());
+        var matches = this.template.match(this.getAnyMatchBetweenBrackets());
         this.variableMap.forEach(function (value, key) {
             // values can be booleans so truthy check will not work
             if (value === null || value === undefined) {
@@ -37,14 +37,14 @@ var StringInterpolator = /** @class */ (function () {
         if (replacement instanceof Object) {
             replacement = replacement.toString();
         }
-        var pattern = this.getPattern(key);
+        var pattern = this.getKeyMatchBetweenBrackets(key);
         this.template = this.template.replace(pattern, replacement);
     };
-    StringInterpolator.prototype.getPattern = function (variableBetweenBrackets) {
+    StringInterpolator.prototype.getKeyMatchBetweenBrackets = function (variableBetweenBrackets) {
         // match variable name between ${} inclusive
         return new RegExp('\\$\\{' + variableBetweenBrackets + '\\}', 'g');
     };
-    StringInterpolator.prototype.getInteriorPattern = function () {
+    StringInterpolator.prototype.getAnyMatchBetweenBrackets = function () {
         return new RegExp('\\${(.*?)}', 'g');
     };
     return StringInterpolator;
