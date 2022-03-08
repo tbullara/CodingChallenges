@@ -1,5 +1,5 @@
 export class StringInterpolator {
-    readonly template: string;
+    template: string;
     readonly variableMap: Map<string, any>;
 
     constructor(template: string, variableMap: Map<string, any>) {
@@ -7,35 +7,49 @@ export class StringInterpolator {
         this.variableMap = variableMap;
     }
 
-    formatData(): string {
-        // throw error if template uses a var not assigned in the map
-        const templateArray: string[] = this.template.split(' ');
+    interpolateTemplate(): string {
+        let matches = this.template.match(this.getInteriorPattern());
 
         this.variableMap.forEach((value, key) => {
-            const templateKey = '${' + key + '}';
-            // includes ensures we have a valid template enclosure
-            const indexToReplace = templateArray.findIndex(item => item.includes(templateKey));
-            if (indexToReplace === -1) {
-                throw new Error(`Key ${key} does not exist in the provided template: ${this.template}`);
-            } else if (value === null || value === undefined) {
+            if (value === null || value === undefined) {
                 throw new Error(`No value provided for ${key}`);
             }
-            else {
-                templateArray[indexToReplace] = this.substitute(templateArray[indexToReplace], key, value);
+
+            if (!matches.some(match => match.includes(key))) {
+                throw new Error(`The provided template contains a variable not present in the map. ` +
+                    `Current template: ${this.template}`);
+            } else {
+                this.substitute(key, value);
             }
+
+            matches = matches.filter(match => !match.includes(key));
         });
 
-        return templateArray.join(' ');
+        // if there are any matches left, then the template contained a key not provided in the map
+        if (matches.length > 0) {
+            throw new Error(`The provided template contains a variable not present in the map. ` +
+                `Current template: ${this.template}`);
+        }
+
+        return this.template;
     }
 
-    substitute(variable: string, key: string, replacement: any): string {
-        // match key between ${} inclusive
-        const pattern = new RegExp('\\$\\{' + key + '\\}', 'g');
+    private substitute(key: string, replacement: any): void {
         if (replacement instanceof Object) {
             replacement = replacement.toString();
         }
-        return variable.replace(pattern, replacement);
+
+        const pattern = this.getPattern(key);
+        this.template = this.template.replace(pattern, replacement);
+    }
+
+    private getPattern(variableBetweenBrackets: string): RegExp {
+        // match variable name between ${} inclusive
+        return new RegExp('\\$\\{' + variableBetweenBrackets + '\\}', 'g');
+    }
+
+    private getInteriorPattern(): RegExp {
+        return new RegExp('\\${(.*?)}', 'g');
     }
 }
-
 
