@@ -149,6 +149,19 @@ describe('Test nonexistent map variable in template error', () => {
     });
 });
 
+
+describe('Test multiple nonexistent map variable in template error', () => {
+    it('substitute', () => {
+        const interpolator = new StringInterpolator('${x} and ${y} and ${z} and ${a}',
+            new Map<string, string>([['x', 'test']]));
+        try {
+            interpolator.interpolateTemplate();
+        } catch(error) {
+            expect(error.message).toBe('The provided template contains a variable not present in the map. Current template: test and ${y} and ${z} and ${a}');
+        }
+    });
+});
+
 describe('Test nonexistent key error', () => {
     it('substitute', () => {
         const interpolator = new StringInterpolator('${x}',
@@ -157,6 +170,30 @@ describe('Test nonexistent key error', () => {
             interpolator.interpolateTemplate();
         } catch(error) {
             expect(error.message).toBe('No value provided for x');
+        }
+    });
+});
+
+describe('Test null variable map', () => {
+    it('substitute', () => {
+        const interpolator = new StringInterpolator('${x}',
+            null);
+        try {
+            interpolator.interpolateTemplate();
+        } catch(error) {
+            expect(error.message).toBe('Please provide a value for template and variable map');
+        }
+    });
+});
+
+describe('Test null template', () => {
+    it('substitute', () => {
+        const interpolator = new StringInterpolator(null,
+            new Map<string, string>([['x', undefined]]));
+        try {
+            interpolator.interpolateTemplate();
+        } catch(error) {
+            expect(error.message).toBe('Please provide a value for template and variable map');
         }
     });
 });

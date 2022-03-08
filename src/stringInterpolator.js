@@ -8,8 +8,11 @@ var StringInterpolator = /** @class */ (function () {
     }
     StringInterpolator.prototype.interpolateTemplate = function () {
         var _this = this;
+        if (!this.template || !this.variableMap)
+            throw new Error('Please provide a value for template and variable map');
         var matches = this.template.match(this.getInteriorPattern());
         this.variableMap.forEach(function (value, key) {
+            // values can be booleans so truthy check will not work
             if (value === null || value === undefined) {
                 throw new Error("No value provided for ".concat(key));
             }
@@ -20,6 +23,7 @@ var StringInterpolator = /** @class */ (function () {
             else {
                 _this.substitute(key, value);
             }
+            // remove match replaced in template
             matches = matches.filter(function (match) { return !match.includes(key); });
         });
         // if there are any matches left, then the template contained a key not provided in the map
@@ -46,7 +50,4 @@ var StringInterpolator = /** @class */ (function () {
     return StringInterpolator;
 }());
 exports.StringInterpolator = StringInterpolator;
-var interp = new StringInterpolator('Hello my name is ${name} my job is ${job} and my dog is ${${dog}}', new Map([['name', 'tucker'], ['job', 'programma'], ['dog', 'billy']]));
-var result = interp.interpolateTemplate();
-console.log(result);
 //# sourceMappingURL=stringInterpolator.js.map

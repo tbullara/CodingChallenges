@@ -8,9 +8,13 @@ export class StringInterpolator {
     }
 
     interpolateTemplate(): string {
+        if (!this.template || !this.variableMap)
+            throw new Error('Please provide a value for template and variable map');
+
         let matches = this.template.match(this.getInteriorPattern());
 
         this.variableMap.forEach((value, key) => {
+            // values can be booleans so truthy check will not work
             if (value === null || value === undefined) {
                 throw new Error(`No value provided for ${key}`);
             }
@@ -22,6 +26,7 @@ export class StringInterpolator {
                 this.substitute(key, value);
             }
 
+            // remove match replaced in template
             matches = matches.filter(match => !match.includes(key));
         });
 
